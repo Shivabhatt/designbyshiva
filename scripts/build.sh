@@ -4,31 +4,28 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SOURCE_DIR="${PORTFOLIO_SOURCE_DIR:-/home/shiva/personal portfolio}"
-BUILD_DIR="${1:-$REPO_ROOT/build}"
 
-rm -rf "$BUILD_DIR"
-mkdir -p "$BUILD_DIR"
+# Clean up old build artifacts (specific files only - never delete .git or scripts)
+rm -f "$REPO_ROOT"/index.html "$REPO_ROOT"/styles.css "$REPO_ROOT"/script.js "$REPO_ROOT"/portfolio.js "$REPO_ROOT"/CNAME "$REPO_ROOT"/.nojekyll 2>/dev/null || true
+rm -rf "$REPO_ROOT"/lib "$REPO_ROOT"/public 2>/dev/null || true
 
+# Copy source files to repo root
 for file in index.html styles.css script.js portfolio.js; do
   if [ -f "$SOURCE_DIR/$file" ]; then
-    cp "$SOURCE_DIR/$file" "$BUILD_DIR/$file"
+    cp "$SOURCE_DIR/$file" "$REPO_ROOT/$file"
   fi
 done
 
 if [ -d "$SOURCE_DIR/lib" ]; then
-  mkdir -p "$BUILD_DIR/lib"
-  cp -R "$SOURCE_DIR/lib/." "$BUILD_DIR/lib/"
+  cp -R "$SOURCE_DIR/lib" "$REPO_ROOT/lib"
 fi
 
 if [ -d "$SOURCE_DIR/public" ]; then
-  mkdir -p "$BUILD_DIR/public"
-  cp -R "$SOURCE_DIR/public/." "$BUILD_DIR/public/"
+  cp -R "$SOURCE_DIR/public" "$REPO_ROOT/public"
 fi
 
-cp "$REPO_ROOT/llm.txt" "$BUILD_DIR/llm.txt"
-cp "$REPO_ROOT/sitemap.xml" "$BUILD_DIR/sitemap.xml"
+# Create SEO and Pages files
+echo 'designbyshiva.in' > "$REPO_ROOT/CNAME"
+: > "$REPO_ROOT/.nojekyll"
 
-echo 'designbyshiva.in' > "$BUILD_DIR/CNAME"
-: > "$BUILD_DIR/.nojekyll"
-
-echo "Built static site to $BUILD_DIR"
+echo "Built static site to $REPO_ROOT (flat structure)"

@@ -1,0 +1,17 @@
+# Ignore local build/test artifacts
+node_modules/
+.DS_Store
+*.log
+
+# Ignore source-only helper files not needed for deployment
+# Keep the build script tracked so the workflow can run
+# scripts/
+
+# Ignore extra media and temporary assets that are not required for the public site
+public/video/Okay_so_I_have_an_idea_for_yo.mp4
+# public/video/output_mobile.mp4
+public/video/*.tmp
+build/
+
+# Keep only deployable GitHub Pages content in the repo root
+# index.html, styles.css, script.js, portfolio.js, lib/, public/, CNAME, .nojekyll
