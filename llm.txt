@@ -1,0 +1,11 @@
+# Shiva Bhatt Portfolio
+
+This website is the personal portfolio of Shiva Bhatt, a frontend developer focused on modern, responsive, and user-centered web experiences.
+
+Key topics:
+- Frontend development
+- UI/UX and interaction design
+- Responsive and accessible web experiences
+- Portfolio and business websites
+
+Website: https://designbyshiva.in/
