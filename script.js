@@ -11,7 +11,7 @@ const IS_MOBILE = window.matchMedia("(max-width: 800px)").matches;
 
 /* On mobile, use the portrait phone clip instead of the desktop video. */
 if (IS_MOBILE) {
-  video.setAttribute("src", "/public/video/output_mobile.mp4");
+  video.setAttribute("src", "public/video/output_mobile.mp4");
   video.load();
 }
 

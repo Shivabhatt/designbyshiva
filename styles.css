@@ -54,7 +54,7 @@ a:focus-visible,
       rgba(10, 10, 10, 0.84) 74%,
       rgba(10, 10, 10, 0.58) 88%,
       rgba(10, 10, 10, 0.48) 100%),
-    url("/public/portrait.jpg");
+    url("public/portrait.jpg");
   background-repeat: no-repeat, no-repeat;
   /* Portrait is cropped to the subject and anchored to the far right so the face
      shows from around the WORK nav column; the left ~60% stays solid dark and a
@@ -527,7 +527,7 @@ a:focus-visible,
         rgba(10, 10, 10, 0.98) 45%,
         rgba(10, 10, 10, 0.82) 70%,
         rgba(10, 10, 10, 0.6) 100%),
-      url("/public/portrait.jpg");
+      url("public/portrait.jpg");
     /* Zoomed so the face lands on the right (around the contact-nav side); the
        left stays solid dark so the full-width text remains legible. */
     background-size: cover, auto 140%;
