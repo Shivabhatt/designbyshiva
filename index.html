@@ -31,8 +31,17 @@
         <span class="sig-word"><span class="sig-word-inner">Shiva</span></span>
     </div>
 
-    <!-- Intro: scroll-scrubbed video -->
-    <video src="public/video/output.mp4" playsinline="true" webkit-playsinline="true" preload="auto" muted="muted" class="video-background"></video>
+    <!-- Intro: scroll-scrubbed video. The src is chosen synchronously below,
+         BEFORE the browser preloads, so laptop always gets the landscape clip and
+         mobile always gets the portrait clip — no wrong-video flash at the start. -->
+    <video playsinline="true" webkit-playsinline="true" preload="auto" muted="muted" class="video-background"></video>
+    <script>
+      (function () {
+        var v = document.querySelector(".video-background");
+        var isMobile = window.matchMedia("(max-width: 800px)").matches;
+        v.setAttribute("src", isMobile ? "public/video/output_mobile.mp4" : "public/video/output.mp4");
+      })();
+    </script>
 
     <div id="container"></div>
 
@@ -143,7 +152,7 @@
                             <h2 class="work-title">MyISP</h2>
                             <span class="work-meta">Accenture · Oct 2023 – Jan 2025</span>
                         </div>
-                        <span class="work-sub">High-performance data-grid web app · Angular 12</span>
+                        <span class="work-sub">High-performance web app · Angular 12</span>
                         <div class="work-details"><div class="work-details-inner">
                             <ul>
                                 <li>RxJS observables for efficient async data handling and seamless API integration.</li>

@@ -9,14 +9,9 @@
 const video = document.querySelector(".video-background");
 const IS_MOBILE = window.matchMedia("(max-width: 800px)").matches;
 
-/* On mobile, use the portrait phone clip instead of the desktop video. */
-if (IS_MOBILE) {
-  video.setAttribute("src", "public/video/output_mobile.mp4");
-  video.load();
-}
-
-/* Prefer the attribute we set (desktop default or mobile swap) over currentSrc,
-   which can transiently still report the old source right after a load(). */
+/* The correct clip (laptop = landscape, mobile = portrait) is already chosen by
+   the inline script in index.html, before the browser preloads. Read it back
+   from the attribute rather than currentSrc, which can transiently lag. */
 let src = video.getAttribute("src") || video.currentSrc || video.src;
 
 /* Make sure the video is 'activated' on iOS */
