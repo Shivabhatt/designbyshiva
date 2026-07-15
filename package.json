@@ -1,0 +1,12 @@
+{
+  "name": "designbyshiva",
+  "version": "1.0.0",
+  "private": false,
+  "homepage": "https://Shivabhatt.github.io/designbyshiva",
+  "scripts": {
+    "deploy": "gh-pages -d ."
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
+}

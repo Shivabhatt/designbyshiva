@@ -22,11 +22,15 @@ a:focus-visible,
 /* ---------- Intro video (scroll-scrubbed) ---------- */
 .video-background {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  min-width: 100%;
-  min-height: 100%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Landscape desktop clip: fill the viewport (cover) so it reads full-screen.
+     Mobile keeps its own cover rule below. */
+  object-fit: cover;
+  object-position: center;
+  background: #0a0a0a;
   z-index: 0;
 }
 
@@ -54,7 +58,7 @@ a:focus-visible,
       rgba(10, 10, 10, 0.84) 74%,
       rgba(10, 10, 10, 0.58) 88%,
       rgba(10, 10, 10, 0.48) 100%),
-    url("/public/portrait.jpg");
+    url("public/portrait.jpg");
   background-repeat: no-repeat, no-repeat;
   /* Portrait is cropped to the subject and anchored to the far right so the face
      shows from around the WORK nav column; the left ~60% stays solid dark and a
@@ -280,9 +284,18 @@ a:focus-visible,
 .cv-link:hover { border-color: #fff; }
 
 /* ---------- Work ---------- */
-/* Transparent so the same fixed portrait backdrop shows behind the work rows. */
 .work {
   position: relative;
+}
+/* Uploaded background image behind the work rows (both Selected Work and
+   Experience panels), on mobile and laptop. Sits above the fixed portrait
+   backdrop but below the content. */
+.work::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #000 url("/public/images/work-bg.avif") center / cover no-repeat;
 }
 .work .section-inner {
   position: relative;
@@ -425,6 +438,18 @@ a:focus-visible,
 
 /* ---------- Contact ---------- */
 .contact { position: relative; }
+/* Solid black background behind the contact rows (mobile + laptop). */
+.contact::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #000;
+}
+.contact .section-inner {
+  position: relative;
+  z-index: 1;
+}
 
 .contact-list {
   list-style: none;
@@ -486,6 +511,8 @@ a:focus-visible,
   /* Show the hero the same way as on laptop: center the intro copy in the
      viewport (matching the base .intro) instead of anchoring it to the bottom. */
   .intro { align-items: center; }
+  /* Sit the hero copy a little above center on mobile. */
+  .intro .section-inner { transform: translateY(-6vh); }
   #about {
     padding-top: clamp(2rem, 5vh, 3rem);
     padding-bottom: clamp(1.25rem, 3vh, 2rem);
@@ -494,7 +521,8 @@ a:focus-visible,
      sections: same padding pairing (About bottom + Work top) as intro->About. */
   #work { padding-top: clamp(2rem, 5vh, 3rem); }
 
-  /* Full-screen intro video on mobile: cover the viewport without distortion. */
+  /* Intro video on mobile: fill the entire screen (cover), cropping whatever
+     overflows so it always reads full-screen with no dark bars. */
   .video-background {
     top: 0;
     left: 0;
@@ -505,6 +533,14 @@ a:focus-visible,
     transform: none;
     object-fit: cover;
     object-position: center;
+    background: #0a0a0a;
+  }
+
+  /* Slightly smaller "Design by Shiva" signature on mobile, nudged a bit lower
+     from the top. */
+  .hero-signature {
+    font-size: clamp(3.25rem, 9vw, 4.5rem);
+    top: clamp(9rem, 22vh, 14rem);
   }
 
   /* Tighter work rows on mobile: stack the title and meta so the meta no longer
@@ -527,7 +563,7 @@ a:focus-visible,
         rgba(10, 10, 10, 0.98) 45%,
         rgba(10, 10, 10, 0.82) 70%,
         rgba(10, 10, 10, 0.6) 100%),
-      url("/public/portrait.jpg");
+      url("public/portrait.jpg");
     /* Zoomed so the face lands on the right (around the contact-nav side); the
        left stays solid dark so the full-width text remains legible. */
     background-size: cover, auto 140%;
