@@ -40,6 +40,13 @@ a:focus-visible,
   position: relative;
 }
 
+/* Mobile: shorter scroll span so the scrubbed video plays faster per scroll */
+@media (max-width: 800px) {
+  #container {
+    height: 300vh;
+  }
+}
+
 /* Dark stage: fades in over the video's last frame so the white "disappears".
    Sits above the video, below the portfolio content and header.
    It also carries the fixed portrait backdrop (drukarov-style): the subject sits

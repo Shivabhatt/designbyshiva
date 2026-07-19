@@ -42,10 +42,10 @@ let tl = gsap.timeline({
     /* Desktop's last frame is light, so the scrub ends early (70%) and a dark
        stage crossfades in over the remaining scroll to hide the white. The
        mobile clip already ends on black, so run the scrub right up to where the
-       portfolio content begins (80% — where #portfolio's -100vh margin puts it)
-       so the hero text starts on that final black frame with no dead black
-       scroll in between. */
-    end: IS_MOBILE ? "80% top" : "70% top",
+       portfolio content begins (66.7% — with the mobile 300vh container,
+       #portfolio's -100vh margin puts it at 200vh) so the hero text starts on
+       that final black frame with no dead black scroll in between. */
+    end: IS_MOBILE ? "66.7% top" : "70% top",
     scrub: true
   }
 });
@@ -111,8 +111,8 @@ gsap.to(".stage-dark", {
   ease: "none",
   scrollTrigger: {
     trigger: "#container",
-    start: IS_MOBILE ? "72% top" : "76% top",
-    end: "80% top",
+    start: IS_MOBILE ? "53.3% top" : "76% top",
+    end: IS_MOBILE ? "66.7% top" : "80% top",
     scrub: true,
   },
 });
