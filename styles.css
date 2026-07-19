@@ -505,6 +505,9 @@ a:focus-visible,
 /* ---------- Responsive ---------- */
 @media (max-width: 800px) {
   .section { padding: 6rem 0; }
+
+  /* Hide the header nav links on mobile (only the name shows, like drukarov.com). */
+  .site-nav { display: none; }
   .section-inner { padding-left: 6vw; padding-right: 6vw; }
   .lead { max-width: none; }
 
@@ -538,9 +541,11 @@ a:focus-visible,
 
   /* Slightly smaller "Design by Shiva" signature on mobile, nudged a bit lower
      from the top. */
+  /* Centered in the middle of the screen on mobile. */
   .hero-signature {
-    font-size: clamp(3.25rem, 9vw, 4.5rem);
-    top: clamp(9rem, 22vh, 14rem);
+    font-size: clamp(2.25rem, 8vw, 3rem);
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 
   /* Tighter work rows on mobile: stack the title and meta so the meta no longer

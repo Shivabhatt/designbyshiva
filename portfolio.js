@@ -57,6 +57,23 @@ if (header) {
     },
   });
 
+  /* Mobile (like drukarov.com): the name isn't pinned — once you scroll past
+     the hero it slides up 1:1 with the page, as if it were page content. */
+  if (window.matchMedia("(max-width: 800px)").matches) {
+    const headerGap = () => header.offsetHeight + 24;
+    gsap.to(header, {
+      y: () => -headerGap(),
+      ease: "none",
+      scrollTrigger: {
+        trigger: "#about",
+        start: "top bottom",
+        end: () => "+=" + headerGap(),
+        scrub: true,
+        invalidateOnRefresh: true,
+      },
+    });
+  }
+
   const navLinks = document.querySelectorAll(".site-nav a");
   const setActive = (id) => {
     navLinks.forEach((a) => a.classList.toggle("active", a.dataset.section === id));
