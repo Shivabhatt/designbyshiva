@@ -171,9 +171,12 @@ gsap.to(".sig-word-inner", {
   },
 });
 
-/* When first coded, the Blobbing was important to ensure the browser wasn't dropping previously played segments, but it doesn't seem to be a problem now. Possibly based on memory availability? */
+/* When first coded, the Blobbing was important to ensure the browser wasn't dropping previously played segments, but it doesn't seem to be a problem now. Possibly based on memory availability?
+   On mobile (iOS Safari) the blob swap reloads the video ~1s in and resets the
+   decode/seek pipeline, which makes scroll-scrubbing update only on the first
+   pass and go stale afterwards — so skip it on mobile entirely. */
 setTimeout(function () {
-  if (window["fetch"]) {
+  if (!IS_MOBILE && window["fetch"]) {
     fetch(src)
       .then((response) => response.blob())
       .then((response) => {
