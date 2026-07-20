@@ -18,17 +18,16 @@ window.scrollTo(0, 0);
 function forceTop() {
   var until = Date.now() + 700;
   (function pin() {
-    window.scrollTo(0, 0);
+    /* Only correct when Safari actually restored a position — calling
+       scrollTo(0,0) every frame fires scroll events that make the scrubbed
+       video/hero flicker on reload. */
+    if (window.scrollY > 0) window.scrollTo(0, 0);
     if (Date.now() < until) requestAnimationFrame(pin);
   })();
 }
 forceTop();
 window.addEventListener("pageshow", forceTop);
 window.addEventListener("load", forceTop);
-/* Also leave the page parked at the top so Safari has nothing to restore. */
-window.addEventListener("beforeunload", function () {
-  window.scrollTo(0, 0);
-});
 
 const video = document.querySelector(".video-background");
 const IS_MOBILE = window.matchMedia("(max-width: 800px)").matches;
