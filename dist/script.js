@@ -12,7 +12,21 @@ if ("scrollRestoration" in history) {
   history.scrollRestoration = "manual";
 }
 window.scrollTo(0, 0);
-window.addEventListener("pageshow", function () {
+/* iOS Safari restores the old scroll position asynchronously — sometimes AFTER
+   load/pageshow — ignoring scrollRestoration="manual". Pin the page to the top
+   for the first moments after every show (reload, back/forward, bfcache). */
+function forceTop() {
+  var until = Date.now() + 700;
+  (function pin() {
+    window.scrollTo(0, 0);
+    if (Date.now() < until) requestAnimationFrame(pin);
+  })();
+}
+forceTop();
+window.addEventListener("pageshow", forceTop);
+window.addEventListener("load", forceTop);
+/* Also leave the page parked at the top so Safari has nothing to restore. */
+window.addEventListener("beforeunload", function () {
   window.scrollTo(0, 0);
 });
 
