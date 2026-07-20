@@ -74,15 +74,35 @@ let tl = gsap.timeline({
 });
 
 function addScrubTween() {
-  tl.fromTo(
-    video,
-    {
-      currentTime: 0
-    },
-    {
-      currentTime: video.duration || 1
-    }
-  );
+  if (IS_MOBILE) {
+    /* iOS Safari: setting video.currentTime on every scroll frame queues up
+       seeks faster than the decoder can finish them; after 2-3 scroll passes
+       the pipeline stalls and the frame stops updating. Instead, tween a proxy
+       value and apply it to the video only when the previous seek has actually
+       completed — the video always ends up at the latest scroll position. */
+    var proxy = { t: 0 };
+    tl.fromTo(proxy, { t: 0 }, { t: video.duration || 1, ease: "none" });
+    (function applySeek() {
+      if (
+        !video.seeking &&
+        video.readyState >= 2 &&
+        Math.abs(video.currentTime - proxy.t) > 0.01
+      ) {
+        video.currentTime = proxy.t;
+      }
+      requestAnimationFrame(applySeek);
+    })();
+  } else {
+    tl.fromTo(
+      video,
+      {
+        currentTime: 0
+      },
+      {
+        currentTime: video.duration || 1
+      }
+    );
+  }
 }
 
 /* If metadata is already available (e.g. cached/local asset), wire the scrub
