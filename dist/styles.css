@@ -1,0 +1,584 @@
+/* ---------- Reset & base ---------- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #0a0a0a;
+  color: #f5f5f7;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Keyboard focus visibility */
+a:focus-visible,
+.copy-btn:focus-visible {
+  outline: 2px solid #f5f5f7;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---------- Intro video (scroll-scrubbed) ---------- */
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Landscape desktop clip: fill the viewport (cover) so it reads full-screen.
+     Mobile keeps its own cover rule below. */
+  object-fit: cover;
+  object-position: center;
+  background: #0a0a0a;
+  z-index: 0;
+}
+
+/* Scroll length that drives the video scrub */
+#container {
+  height: 500vh;
+  position: relative;
+}
+
+/* Mobile: shorter scroll span so the scrubbed video plays faster per scroll */
+@media (max-width: 800px) {
+  #container {
+    height: 300vh;
+  }
+}
+
+/* Dark stage: fades in over the video's last frame so the white "disappears".
+   Sits above the video, below the portfolio content and header.
+   It also carries the fixed portrait backdrop (drukarov-style): the subject sits
+   on the right against the dark studio background, which blends into #0a0a0a; a
+   left-to-right gradient keeps the content side dark and legible. Because the
+   stage is fixed and spans the whole scroll, the same portrait sits behind every
+   section (intro, about, work, contact). */
+.stage-dark {
+  position: fixed;
+  inset: 0;
+  background-color: #0a0a0a;
+  background-image:
+    linear-gradient(90deg,
+      #0a0a0a 0%,
+      rgba(10, 10, 10, 0.99) 60%,
+      rgba(10, 10, 10, 0.84) 74%,
+      rgba(10, 10, 10, 0.58) 88%,
+      rgba(10, 10, 10, 0.48) 100%),
+    url("public/portrait.jpg");
+  background-repeat: no-repeat, no-repeat;
+  /* Portrait is cropped to the subject and anchored to the far right so the face
+     shows from around the WORK nav column; the left ~60% stays solid dark and a
+     residual overlay keeps the subject dark-toned. */
+  background-size: cover, auto 112%;
+  background-position: center, right center;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- Hero signature (subtle cursive mark shown on load) ---------- */
+.hero-signature {
+  position: fixed;
+  top: clamp(3rem, 8vh, 5.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.14em;
+  font-family: "Sacramento", cursive;
+  font-weight: 400;
+  font-size: clamp(4rem, 9vw, 7.5rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: rgba(245, 245, 247, 0.9);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  user-select: none;
+}
+/* Each word is its own clip mask; the inner slides down behind it (word by
+   word) as you scroll, then back up in reverse. Generous vertical padding
+   gives the script's ascenders/descenders (g, y) room so they aren't cropped. */
+.sig-word {
+  display: block;
+  overflow: hidden;
+  padding: 0.16em 0.06em 0.36em;
+}
+.sig-word-inner {
+  display: block;
+  line-height: 1;
+}
+
+/* ---------- Intro hero (black section shown after the video completes) ---------- */
+.intro {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: clamp(6rem, 14vh, 10rem) 0 clamp(3rem, 8vh, 5rem);
+  /* Transparent so the fixed portrait backdrop shows through the hero. */
+  background: transparent;
+}
+/* Match the About section's left alignment. */
+.intro .section-inner {
+  width: 100%;
+}
+.hero-heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-size: clamp(2.4rem, 6.2vw, 5.5rem);
+}
+/* Each line is a clip mask; the inner span slides up from behind it. */
+.hero-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+.hero-line-inner {
+  display: block;
+  will-change: transform;
+  /* Initial hidden state (yPercent 110) is set by GSAP in script.js, which
+     then solely controls this transform for the pinned scroll-scrub reveal. */
+}
+/* The reveal itself is driven by GSAP (pinned + scroll-scrubbed) in script.js,
+   so the lines rise line-by-line as you scroll and re-hide on scroll back. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-line-inner { transform: none; }
+}
+.hero-strong { color: #fff; }
+.hero-muted { color: #9a9aa0; }
+
+/* ---------- Fixed header ---------- */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: clamp(1.3rem, 2.4vw, 2.1rem) clamp(1.5rem, 4vw, 3.2rem);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s ease;
+}
+.site-header.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  pointer-events: auto;
+}
+
+.brand {
+  font-weight: 800;
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: #f5f5f7;
+  text-decoration: none;
+}
+
+.site-nav {
+  display: flex;
+  gap: clamp(1.4rem, 3vw, 3rem);
+}
+.site-nav a {
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #8a8a90;
+  text-decoration: none;
+  padding-bottom: 4px;
+  transition: color 0.25s ease;
+}
+.site-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: #f5f5f7;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.site-nav a:hover,
+.site-nav a.active {
+  color: #f5f5f7;
+}
+.site-nav a:hover::after,
+.site-nav a.active::after {
+  transform: scaleX(1);
+}
+
+/* ---------- Portfolio (scrolls up over the last frame) ---------- */
+#portfolio {
+  position: relative;
+  z-index: 2;
+  /* Transparent so the dark stage shows through; the About section is pulled
+     up to sit in place, then it fades in (crossfade) over the last frame
+     rather than wiping up over it. */
+  background: transparent;
+  margin-top: -100vh;
+}
+
+.section {
+  padding: 9rem 0;
+}
+
+.section-inner {
+  padding-left: clamp(1.5rem, 20vw, 22rem);
+  padding-right: 6vw;
+}
+
+/* Small uppercase section label */
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #6b6b70;
+  margin-bottom: 2.5rem;
+}
+
+/* ---------- About ---------- */
+.lead {
+  font-weight: 700;
+  font-size: clamp(1.8rem, 3.4vw, 3.1rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: #7c7c82;
+  max-width: 17em;
+  margin-bottom: 1.6rem;
+}
+.lead .hl { color: #ffffff; }
+
+.about-body {
+  margin-top: 3.5rem;
+  max-width: 40em;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+.about-body p {
+  color: #86868b;
+  font-size: clamp(1rem, 1.2vw, 1.15rem);
+  line-height: 1.75;
+}
+
+.cv-link {
+  display: inline-block;
+  margin-top: 3rem;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-decoration: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+  padding-bottom: 4px;
+  transition: border-color 0.25s ease;
+}
+.cv-link:hover { border-color: #fff; }
+
+/* ---------- Work ---------- */
+.work {
+  position: relative;
+}
+/* Uploaded background image behind the work rows (both Selected Work and
+   Experience panels), on mobile and laptop. Sits above the fixed portrait
+   backdrop but below the content. */
+.work::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #000 url("/public/images/work-bg.avif") center / cover no-repeat;
+}
+.work .section-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* Work tabs: same animated underline as the header nav */
+.work-tabs {
+  display: flex;
+  gap: clamp(1.6rem, 4vw, 3rem);
+  margin-bottom: clamp(2rem, 4vw, 3.2rem);
+}
+.work-tab {
+  position: relative;
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0 0 6px;
+  cursor: pointer;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: clamp(0.82rem, 1.3vw, 1rem);
+  font-weight: 700;
+  color: #6b6b70;
+  transition: color 0.25s ease;
+}
+.work-tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: #f5f5f7;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.work-tab:hover,
+.work-tab.active { color: #f5f5f7; }
+.work-tab:hover::after,
+.work-tab.active::after { transform: scaleX(1); }
+
+.work-panel[hidden] { display: none; }
+
+.work-list { list-style: none; }
+
+.work-item {
+  position: relative;
+  padding: 2.6rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  transition: transform 0.35s ease;
+  cursor: pointer;
+  outline: none;
+}
+.work-item:last-child { border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+
+/* Selected-work rows link out; the whole row is clickable (stretched link) */
+.work-link {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+  outline: none;
+}
+.work-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.work-item--static { cursor: default; }
+.work-item:hover { transform: translateX(12px); }
+.work-item:focus-visible { transform: translateX(12px); }
+
+.work-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  flex-wrap: wrap;
+}
+.work-meta {
+  color: #6b6b70;
+  font-size: clamp(0.8rem, 1vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.work-title {
+  display: block;
+  font-weight: 800;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+.work-sub {
+  display: block;
+  margin-top: 0.9rem;
+  color: #9a9aa0;
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+}
+
+/* Project details: revealed on hover / focus (smooth grid-rows expand) */
+.work-details {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-top: 0;
+  transition: grid-template-rows 0.5s ease, opacity 0.4s ease, margin-top 0.4s ease;
+}
+.work-details-inner { overflow: hidden; }
+.work-item:hover .work-details,
+.work-item:focus-within .work-details,
+.work-item:focus-visible .work-details {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 1.5rem;
+}
+.work-details ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 46em;
+}
+.work-details li {
+  position: relative;
+  padding-left: 1.2rem;
+  color: #9a9aa0;
+  font-size: clamp(0.92rem, 1.1vw, 1.02rem);
+  line-height: 1.6;
+}
+.work-details li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: #5a5a60;
+}
+
+/* ---------- Contact ---------- */
+.contact { position: relative; }
+/* Solid black background behind the contact rows (mobile + laptop). */
+.contact::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #000;
+}
+.contact .section-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.contact-list {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  margin-top: 2.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contact-item a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: #fff;
+  font-weight: 600;
+  font-size: clamp(1.05rem, 2vw, 1.4rem);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: opacity 0.25s ease;
+}
+.contact-item a:hover { opacity: 0.6; }
+
+.contact-item svg {
+  width: 1.35em;
+  height: 1.35em;
+  flex-shrink: 0;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #6b6b70;
+  cursor: pointer;
+  padding: 0.3rem;
+  transition: color 0.2s ease;
+}
+.copy-btn:hover { color: #fff; }
+
+.copied-msg {
+  font-size: 0.85rem;
+  color: #8a8a8a;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.copied-msg.show { opacity: 1; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 800px) {
+  .section { padding: 6rem 0; }
+
+  /* Hide the header nav links on mobile (only the name shows, like drukarov.com). */
+  .site-nav { display: none; }
+  .section-inner { padding-left: 6vw; padding-right: 6vw; }
+  .lead { max-width: none; }
+
+  /* Show the hero the same way as on laptop: center the intro copy in the
+     viewport (matching the base .intro) instead of anchoring it to the bottom. */
+  .intro { align-items: center; }
+  /* Sit the hero copy a little above center on mobile. */
+  .intro .section-inner { transform: translateY(-6vh); }
+  #about {
+    padding-top: clamp(2rem, 5vh, 3rem);
+    padding-bottom: clamp(1.25rem, 3vh, 2rem);
+  }
+  /* Match the tight hero->About gap between the About and Work (Selected Work)
+     sections: same padding pairing (About bottom + Work top) as intro->About. */
+  #work { padding-top: clamp(2rem, 5vh, 3rem); }
+
+  /* Intro video on mobile: fill the entire screen (cover), cropping whatever
+     overflows so it always reads full-screen with no dark bars. */
+  .video-background {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    transform: none;
+    object-fit: cover;
+    object-position: center;
+    background: #0a0a0a;
+  }
+
+  /* Slightly smaller "Design by Shiva" signature on mobile, nudged a bit lower
+     from the top. */
+  /* Centered in the middle of the screen on mobile. */
+  .hero-signature {
+    font-size: clamp(2.25rem, 8vw, 3rem);
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Tighter work rows on mobile: stack the title and meta so the meta no longer
+     wraps onto its own line, and trim the vertical padding that left big gaps. */
+  .work-item { padding: 1.4rem 0; }
+  .work-item:hover { transform: none; }
+  .work-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+  .work-title { font-size: clamp(2rem, 4vw, 2.6rem); }
+  .work-sub { margin-top: 0.5rem; }
+  /* On narrow screens the content spans full width, so push the portrait to the
+     top-right and deepen the overlay so text stays legible over it. */
+  .stage-dark {
+    background-image:
+      linear-gradient(90deg,
+        #0a0a0a 0%,
+        rgba(10, 10, 10, 0.98) 45%,
+        rgba(10, 10, 10, 0.82) 70%,
+        rgba(10, 10, 10, 0.6) 100%),
+      url("public/portrait.jpg");
+    /* Zoomed so the face lands on the right (around the contact-nav side); the
+       left stays solid dark so the full-width text remains legible. */
+    background-size: cover, auto 140%;
+    background-position: center, left center;
+  }
+}
